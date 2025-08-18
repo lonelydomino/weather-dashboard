@@ -20,8 +20,14 @@ const WeatherMap = ({ weather, forecast, city }) => {
     console.log('Weather:', weather);
     console.log('Map ref:', mapRef.current);
     
-    if (!weather || !mapRef.current) {
-      console.log('Early return - weather:', !!weather, 'mapRef:', !!mapRef.current);
+    if (!weather) {
+      console.log('Early return - no weather data');
+      return;
+    }
+    
+    // Wait for the ref to be ready
+    if (!mapRef.current) {
+      console.log('Map ref not ready, waiting...');
       return;
     }
 
@@ -169,6 +175,15 @@ const WeatherMap = ({ weather, forecast, city }) => {
       }
     };
   }, [weather, forecast, city]);
+  
+  // Separate useEffect to handle ref initialization
+  useEffect(() => {
+    if (mapRef.current && weather && !mapInstanceRef.current) {
+      console.log('Ref is ready, initializing map...');
+      // Trigger the main useEffect by updating a state
+      setCoordinates(prev => ({ ...prev }));
+    }
+  }, [mapRef.current, weather]);
 
   if (!weather) return null;
   
