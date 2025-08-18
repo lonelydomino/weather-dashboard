@@ -25,7 +25,7 @@ const PrecipitationChart = ({ forecast }) => {
   useEffect(() => {
     // Force chart update when data changes
     if (chartRef.current) {
-      console.log('PrecipitationChart - Chart ref updated, forcing re-render');
+      // Chart ref updated, forcing re-render
     }
   }, [forecast]);
 
@@ -42,9 +42,6 @@ const PrecipitationChart = ({ forecast }) => {
     );
   }
 
-  // Debug logging
-  console.log('PrecipitationChart - forecast data:', forecast);
-
   // Extract dates and precipitation data
   const dates = forecast.map(day => {
     const date = new Date(day.date);
@@ -57,10 +54,6 @@ const PrecipitationChart = ({ forecast }) => {
 
   const precipitation = forecast.map(day => day.precipitation_mm);
   const maxWind = forecast.map(day => day.max_wind_kph);
-
-  console.log('PrecipitationChart - dates:', dates);
-  console.log('PrecipitationChart - precipitation:', precipitation);
-  console.log('PrecipitationChart - maxWind:', maxWind);
 
   const data = {
     labels: dates,

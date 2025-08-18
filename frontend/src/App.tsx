@@ -223,38 +223,14 @@ function App() {
         {forecast && forecast.length > 0 && (
           <section className="charts-section">
             <div className="chart-container">
-              {console.log('Rendering TemperatureChart with forecast:', forecast)}
-              {console.log('Forecast data for TemperatureChart:', {
-                length: forecast.length,
-                firstDay: forecast[0],
-                hasMaxTemp: forecast[0]?.max_temp_c !== undefined,
-                hasMinTemp: forecast[0]?.min_temp_c !== undefined
-              })}
               <TemperatureChart key={`temp-${city}-${temperatureUnit}`} forecast={forecast} temperatureUnit={temperatureUnit} />
             </div>
             <div className="chart-container">
-              {console.log('Rendering PrecipitationChart with forecast:', forecast)}
-              {console.log('Forecast data for PrecipitationChart:', {
-                length: forecast.length,
-                firstDay: forecast[0],
-                hasPrecipitation: forecast[0]?.precipitation_mm !== undefined,
-                hasWind: forecast[0]?.max_wind_kph !== undefined
-              })}
               <PrecipitationChart key={`precip-${city}`} forecast={forecast} />
             </div>
           </section>
         )}
         
-        {/* Debug: Show forecast data if available */}
-        {forecast && forecast.length > 0 && (
-          <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.1)', margin: '1rem', borderRadius: '10px' }}>
-            <h4>Debug: Forecast Data</h4>
-            <pre style={{ color: 'white', fontSize: '12px', overflow: 'auto' }}>
-              {JSON.stringify(forecast, null, 2)}
-            </pre>
-          </div>
-        )}
-
         {/* Weather Map */}
         {weather && (
           <section className="map-section">
