@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { TemperatureChart, PrecipitationChart } from './components'
+import { TemperatureChart, PrecipitationChart, WeatherMap } from './components'
 
 function App() {
   // State variables to store our data
@@ -190,9 +190,17 @@ function App() {
             <PrecipitationChart forecastData={forecast} />
           </div>
         )}
+
+        {/* Weather Map Section */}
+        {weather && (
+          <div className="map-section">
+            <WeatherMap weather={weather} forecast={forecast} city={city} />
+          </div>
+        )}
       </header>
     </div>
   )
 }
 
 export default App
+

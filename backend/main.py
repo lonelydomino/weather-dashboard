@@ -61,6 +61,10 @@ async def get_current_weather(city: str):
                     "city": data["location"]["name"],
                     "country": data["location"]["country"],
                     "region": data["location"]["region"],
+                    "coordinates": {
+                        "lat": data["location"]["lat"],
+                        "lon": data["location"]["lon"]
+                    },
                     "current": {
                         "temperature_c": data["current"]["temp_c"],
                         "temperature_f": data["current"]["temp_f"],
