@@ -11,7 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const WeatherMap = ({ weather, forecast, city }) => {
+const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
@@ -101,7 +101,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
         className: 'weather-marker',
         html: `
           <div class="marker-content">
-            <div class="marker-temp">${Math.round(weather.current.temperature_c)}°C</div>
+            <div class="marker-temp">${Math.round(weather.current.temperature_f)}°F</div>
             <div class="marker-weather-icon">${getWeatherIcon(weather.current.condition)}</div>
           </div>
         `,
@@ -117,12 +117,12 @@ const WeatherMap = ({ weather, forecast, city }) => {
         <div class="map-popup">
           <h3>${weather.city}, ${weather.country}</h3>
           <div class="popup-weather">
-            <div class="popup-temp">${weather.current.temperature_c}°C / ${weather.current.temperature_f}°F</div>
+            <div class="popup-temp">${weather.current.temperature_f}°F / ${weather.current.temperature_c}°C</div>
             <div class="popup-condition">${weather.current.condition}</div>
             <div class="popup-details">
               <p>Humidity: ${weather.current.humidity}%</p>
               <p>Wind: ${weather.current.wind_speed_kph} km/h</p>
-              <p>Feels like: ${weather.current.feels_like_c}°C</p>
+              <p>Feels like: ${weather.current.feels_like_f}°F</p>
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
               html: `
                 <div class="forecast-marker-content">
                   <div class="forecast-date">${new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                  <div class="forecast-temp">${Math.round(day.max_temp_c)}°</div>
+                  <div class="forecast-temp">${Math.round(day.max_temp_f)}°</div>
                   <div class="forecast-weather-icon">${getWeatherIcon(day.condition)}</div>
                 </div>
               `,
@@ -155,7 +155,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
               <div class="forecast-popup">
                 <h4>${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</h4>
                 <div class="forecast-popup-weather">
-                  <div class="forecast-popup-temp">High: ${day.max_temp_c}°C / Low: ${day.min_temp_c}°C</div>
+                  <div class="forecast-popup-temp">High: ${day.max_temp_f}°F / Low: ${day.min_temp_f}°F</div>
                   <div class="forecast-popup-condition">${day.condition}</div>
                   <div class="forecast-popup-details">
                     <p>Precipitation: ${day.precipitation_mm}mm</p>
