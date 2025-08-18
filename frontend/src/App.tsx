@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon } from './components'
+import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground } from './components'
 
 function App() {
   // State variables to store our data
@@ -109,120 +109,130 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>🌤️ Weather Dashboard</h1>
-        
-        {/* Temperature Unit Toggle */}
-        <div className="temperature-toggle">
-          <button 
-            onClick={() => setTemperatureUnit('celsius')}
-            className={`toggle-button ${temperatureUnit === 'celsius' ? 'active' : ''}`}
-          >
-            °C
-          </button>
-          <button 
-            onClick={() => setTemperatureUnit('fahrenheit')}
-            className={`toggle-button ${temperatureUnit === 'fahrenheit' ? 'active' : ''}`}
-          >
-            °F
-          </button>
-        </div>
-        
-        {/* Location Detection Section */}
-        <div className="location-section">
-          <button 
-            onClick={detectLocation}
-            disabled={isDetectingLocation || loading}
-            className="location-button"
-          >
-            {isDetectingLocation ? '📍 Detecting...' : '📍 Use My Location'}
-          </button>
-          <div className="location-info">
-            {isDetectingLocation && (
-              <small className="location-hint">
-                Getting your location...
-              </small>
-            )}
-            {locationPermission === 'denied' && !isDetectingLocation && (
-              <small className="location-hint">
-                Location access denied. You can still search for cities manually.
-              </small>
-            )}
+    <DynamicBackground weather={weather}>
+      <div className="App">
+        <header className="App-header">
+          <h1>🌤️ Weather Dashboard</h1>
+          
+          {/* Temperature Toggle */}
+          <div className="temperature-toggle">
+            <button 
+              className={`toggle-button ${temperatureUnit === 'celsius' ? 'active' : ''}`}
+              onClick={() => setTemperatureUnit('celsius')}
+            >
+              °C
+            </button>
+            <button 
+              className={`toggle-button ${temperatureUnit === 'fahrenheit' ? 'active' : ''}`}
+              onClick={() => setTemperatureUnit('fahrenheit')}
+            >
+              °F
+            </button>
           </div>
-        </div>
-        
-        {/* Search Section */}
-        <div className="search-section">
-          <input
-            type="text"
-            placeholder="Enter city name..."
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && fetchWeather()}
-            className="city-input"
-          />
-          <button 
-            onClick={fetchWeather}
-            disabled={loading || !city.trim()}
-            className="search-button"
-          >
-            {loading ? 'Loading...' : 'Search'}
-          </button>
-        </div>
+        </header>
 
-        {/* Error Display */}
-        {error && (
-          <div className="error-message">
-            {error}
+        {/* Search Section */}
+        <section className="search-section">
+          <div className="search-container">
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Enter city name..."
+              className="city-input"
+              onKeyPress={(e) => e.key === 'Enter' && fetchWeatherData()}
+            />
+            <button onClick={fetchWeatherData} className="search-button">
+              Search
+            </button>
+            
+            {/* Location Detection */}
+            <div className="location-section">
+              <button 
+                onClick={detectLocation} 
+                className="location-button"
+                disabled={isDetectingLocation}
+              >
+                {isDetectingLocation ? '📍 Detecting...' : '📍 Use My Location'}
+              </button>
+              
+              {locationPermission === 'denied' && (
+                <div className="location-hint">
+                  Location access denied. Please enable location permissions in your browser.
+                </div>
+              )}
+              
+              {isDetectingLocation && (
+                <div className="location-hint">
+                  Getting your location...
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </section>
 
         {/* Weather Display */}
         {weather && (
-          <div className="weather-display">
-            <h2>{weather.city}, {weather.country}</h2>
+          <section className="weather-display">
             <div className="weather-info">
-              <div className="temperature">
-                {temperatureUnit === 'celsius' 
-                  ? `${weather.current.temperature_c}°C` 
-                  : `${weather.current.temperature_f}°F`
-                }
+              <div className="location">
+                <h2>{weather.city}, {weather.region}</h2>
+                <p>{weather.country}</p>
               </div>
               <div className="condition">
                 <WeatherIcon condition={weather.current.condition} />
               </div>
               <div className="details">
-                <p>Humidity: {weather.current.humidity}%</p>
-                <p>Wind: {weather.current.wind_speed_kph} km/h</p>
-                <p>Feels like: {temperatureUnit === 'celsius' 
-                  ? `${weather.current.feels_like_c}°C` 
-                  : `${weather.current.feels_like_f}°F`
-                }</p>
-                <p>Pressure: {weather.current.pressure_mb} mb</p>
-                <p>UV Index: {weather.current.uv_index}</p>
+                <div className="temperature">
+                  {temperatureUnit === 'celsius' 
+                    ? `${weather.current.temperature_c}°C` 
+                    : `${weather.current.temperature_f}°F`
+                  }
+                </div>
+                <div className="feels-like">
+                  Feels like: {temperatureUnit === 'celsius' 
+                    ? `${weather.current.feels_like_c}°C` 
+                    : `${weather.current.feels_like_f}°F`
+                  }
+                </div>
+                <div className="weather-details">
+                  <div>Humidity: {weather.current.humidity}%</div>
+                  <div>Wind: {weather.current.wind_kph} km/h</div>
+                  <div>Pressure: {weather.current.pressure_mb} mb</div>
+                  <div>UV Index: {weather.current.uv}</div>
+                </div>
+                <div className="last-updated">
+                  Last updated: {weather.last_updated}
+                </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
         {/* Charts Section */}
-        {forecast && forecast.length > 0 && (
-          <div className="charts-section">
-            <TemperatureChart forecastData={forecast} temperatureUnit={temperatureUnit} />
-            <PrecipitationChart forecastData={forecast} />
-          </div>
+        {forecast && (
+          <section className="charts-section">
+            <div className="chart-container">
+              <TemperatureChart forecast={forecast} temperatureUnit={temperatureUnit} />
+            </div>
+            <div className="chart-container">
+              <PrecipitationChart forecast={forecast} />
+            </div>
+          </section>
         )}
 
-        {/* Weather Map Section */}
+        {/* Weather Map */}
         {weather && (
-          <div className="map-section">
-            <WeatherMap weather={weather} forecast={forecast} city={city} />
-          </div>
+          <section className="map-section">
+            <h2>Weather Map</h2>
+            <div className="weather-map">
+              <WeatherMap weather={weather} forecast={forecast} city={city} />
+            </div>
+          </section>
         )}
-      </header>
-    </div>
-  )
+      </div>
+    </DynamicBackground>
+  );
 }
 
 export default App
