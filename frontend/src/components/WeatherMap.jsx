@@ -49,7 +49,13 @@ const WeatherMap = ({ weather, forecast, city }) => {
     // Initialize map if it doesn't exist
     if (!mapInstanceRef.current) {
       console.log('Initializing new map...');
-      mapInstanceRef.current = L.map(mapRef.current).setView([0, 0], 10);
+      // Find the map div within the ref container
+      const mapElement = mapRef.current.querySelector('.map');
+      if (!mapElement) {
+        console.log('Map element not found');
+        return;
+      }
+      mapInstanceRef.current = L.map(mapElement).setView([0, 0], 10);
       
       // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -183,14 +189,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
     };
   }, [weather, forecast, city]);
   
-  // Separate useEffect to handle ref initialization
-  useEffect(() => {
-    if (mapRef.current && weather && !mapInstanceRef.current) {
-      console.log('Ref is ready, initializing map...');
-      // Trigger the main useEffect by updating a state
-      setCoordinates(prev => ({ ...prev }));
-    }
-  }, [mapRef.current, weather]);
+  // Remove the separate useEffect that was causing issues
 
   if (!weather) return null;
   
@@ -214,7 +213,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
   console.log('Rendering map with coordinates:', coordinates.lat, coordinates.lng);
 
   return (
-    <div className="weather-map">
+    <div className="weather-map" ref={mapRef}>
       <h3>Weather Map</h3>
       
       {/* Debug info - remove this after fixing */}
@@ -226,7 +225,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
       </div>
       
       <div className="map-container">
-        <div ref={mapRef} className="map" />
+        <div className="map" />
       </div>
       <div className="map-legend">
         <div className="legend-item">
