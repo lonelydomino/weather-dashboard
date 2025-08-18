@@ -95,15 +95,7 @@ function App() {
       const forecastResponse = await fetch(`http://localhost:8000/api/weather/forecast/${cityName}`);
       if (forecastResponse.ok) {
         const forecastData = await forecastResponse.json();
-        console.log('Raw forecast response:', forecastData);
-        console.log('Forecast data structure:', {
-          hasForecast: !!forecastData.forecast,
-          forecastLength: forecastData.forecast?.length,
-          forecastKeys: forecastData.forecast?.[0] ? Object.keys(forecastData.forecast[0]) : [],
-          sampleForecast: forecastData.forecast?.[0]
-        });
         setForecast(forecastData.forecast);
-        console.log('Set forecast state:', forecastData.forecast);
       } else {
         console.error('Forecast response not ok:', forecastResponse.status, forecastResponse.statusText);
       }
