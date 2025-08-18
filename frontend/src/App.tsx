@@ -230,7 +230,7 @@ function App() {
                 hasMaxTemp: forecast[0]?.max_temp_c !== undefined,
                 hasMinTemp: forecast[0]?.min_temp_c !== undefined
               })}
-              <TemperatureChart forecast={forecast} temperatureUnit={temperatureUnit} />
+              <TemperatureChart key={`temp-${city}-${temperatureUnit}`} forecast={forecast} temperatureUnit={temperatureUnit} />
             </div>
             <div className="chart-container">
               {console.log('Rendering PrecipitationChart with forecast:', forecast)}
@@ -240,7 +240,7 @@ function App() {
                 hasPrecipitation: forecast[0]?.precipitation_mm !== undefined,
                 hasWind: forecast[0]?.max_wind_kph !== undefined
               })}
-              <PrecipitationChart forecast={forecast} />
+              <PrecipitationChart key={`precip-${city}`} forecast={forecast} />
             </div>
           </section>
         )}

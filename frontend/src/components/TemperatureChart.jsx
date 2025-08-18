@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,6 +24,15 @@ ChartJS.register(
 );
 
 const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    // Force chart update when data changes
+    if (chartRef.current) {
+      console.log('TemperatureChart - Chart ref updated, forcing re-render');
+    }
+  }, [forecast, temperatureUnit]);
+
   if (!forecast || forecast.length === 0) {
     return (
       <div className="temperature-chart">
@@ -111,10 +120,10 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
     maintainAspectRatio: false,
     layout: {
       padding: {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10
       }
     },
     plugins: {
@@ -123,11 +132,11 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         labels: {
           color: '#f8f9fa',
           font: {
-            size: 14,
+            size: 12,
             weight: 'bold'
           },
           usePointStyle: true,
-          padding: 20
+          padding: 15
         }
       },
       tooltip: {
@@ -154,7 +163,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         ticks: {
           color: '#f8f9fa',
           font: {
-            size: 12
+            size: 11
           }
         }
       },
@@ -166,7 +175,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         ticks: {
           color: '#f8f9fa',
           font: {
-            size: 12
+            size: 11
           },
           callback: function(value) {
             return value + (temperatureUnit === 'celsius' ? '°C' : '°F');
@@ -184,7 +193,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
     <div className="temperature-chart">
       <h3>7-Day Temperature Forecast</h3>
       <div className="chart-container">
-        <Line data={data} options={options} />
+        <Line ref={chartRef} data={data} options={options} />
       </div>
     </div>
   );

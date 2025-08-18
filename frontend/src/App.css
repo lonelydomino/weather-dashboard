@@ -543,7 +543,6 @@ h1 {
   height: 350px;
   width: 100%;
   position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -572,6 +571,13 @@ h1 {
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   flex-shrink: 0;
+}
+
+/* Ensure Chart.js can render properly */
+.chart-container > div {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
 }
 
 /* Responsive Charts */

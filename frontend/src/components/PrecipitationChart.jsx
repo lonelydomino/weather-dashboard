@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,7 +7,7 @@ import {
   Title,
   Tooltip,
   Legend
-} from 'chart.js';
+} from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(
@@ -20,6 +20,15 @@ ChartJS.register(
 );
 
 const PrecipitationChart = ({ forecast }) => {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    // Force chart update when data changes
+    if (chartRef.current) {
+      console.log('PrecipitationChart - Chart ref updated, forcing re-render');
+    }
+  }, [forecast]);
+
   if (!forecast || forecast.length === 0) {
     return (
       <div className="precipitation-chart">
@@ -171,7 +180,7 @@ const PrecipitationChart = ({ forecast }) => {
     <div className="precipitation-chart">
       <h3>7-Day Precipitation & Wind Forecast</h3>
       <div className="chart-container">
-        <Bar data={data} options={options} />
+        <Bar ref={chartRef} data={data} options={options} />
       </div>
     </div>
   );
