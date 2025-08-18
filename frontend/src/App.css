@@ -250,6 +250,22 @@ h1 {
   }
 }
 
+/* Map Loading State */
+.map-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #f8f9fa;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  margin: 1rem 0;
+}
+
+.map-loading p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
 /* Weather Map Section */
 .map-section {
   width: 100%;

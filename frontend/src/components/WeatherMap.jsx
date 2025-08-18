@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -13,6 +13,7 @@ L.Icon.Default.mergeOptions({
 const WeatherMap = ({ weather, forecast, city }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
 
   useEffect(() => {
     if (!weather || !mapRef.current) return;
@@ -61,6 +62,9 @@ const WeatherMap = ({ weather, forecast, city }) => {
     }
 
     console.log('Final coordinates for map:', lat, lng);
+    
+    // Update coordinates state
+    setCoordinates({ lat, lng });
 
     if (lat && lng) {
       // Set map view to the city
@@ -151,6 +155,18 @@ const WeatherMap = ({ weather, forecast, city }) => {
   }, [weather, forecast, city]);
 
   if (!weather) return null;
+  
+  // Don't render map if coordinates are not available
+  if (!coordinates.lat || !coordinates.lng) {
+    return (
+      <div className="weather-map">
+        <h3>Weather Map</h3>
+        <div className="map-loading">
+          <p>Loading map coordinates...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="weather-map">
@@ -161,7 +177,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
         <strong>Debug Info:</strong><br/>
         City: {weather?.city}<br/>
         Coordinates: {weather?.coordinates ? `${weather.coordinates.lat}, ${weather.coordinates.lon}` : 'None'}<br/>
-        Using: {lat}, {lng}
+        Using: {coordinates.lat}, {coordinates.lng}
       </div>
       
       <div className="map-container">
