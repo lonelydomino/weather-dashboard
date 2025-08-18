@@ -118,8 +118,13 @@ const DynamicBackground = ({ weather, children }) => {
 
   return (
     <div className="dynamic-background" style={backgroundStyle}>
-      <div className="background-overlay"></div>
-      <div className="sun-moon-icon">{backgroundStyle['--sun-moon']}</div>
+      <div className="background-overlay" style={{ background: backgroundStyle['--overlay'] }}></div>
+      <div className="sun-moon-icon" style={{ 
+        top: backgroundStyle['--sun-moon-position']?.split(' ')[0] || '20%',
+        left: backgroundStyle['--sun-moon-position']?.split(' ')[1] || '20%'
+      }}>
+        {backgroundStyle['--sun-moon']}
+      </div>
       {children}
     </div>
   );
