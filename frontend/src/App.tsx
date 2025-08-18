@@ -226,7 +226,6 @@ function App() {
         {/* Weather Map */}
         {weather && (
           <section className="map-section">
-            <h2>Weather Map</h2>
             <div className="weather-map">
               <WeatherMap weather={weather} forecast={forecast} city={city} />
             </div>
