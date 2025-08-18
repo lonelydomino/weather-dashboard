@@ -7,7 +7,7 @@ import {
   Title,
   Tooltip,
   Legend
-} from 'react-chartjs-2';
+} from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(
