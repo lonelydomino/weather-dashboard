@@ -196,22 +196,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
   // Debug the loading condition
   console.log('Render check - weather:', !!weather, 'coordinates:', coordinates, 'lat:', coordinates.lat, 'lng:', coordinates.lng);
   
-  // Don't render map if coordinates are not available
-  if (!coordinates.lat || !coordinates.lng) {
-    console.log('Showing loading state - coordinates not ready');
-    return (
-      <div className="weather-map">
-        <h3>Weather Map</h3>
-        <div className="map-loading">
-          <p>Loading map coordinates...</p>
-          <p>Debug: lat={coordinates.lat}, lng={coordinates.lng}</p>
-        </div>
-      </div>
-    );
-  }
-  
-  console.log('Rendering map with coordinates:', coordinates.lat, coordinates.lng);
-
+  // Always render the container with ref, but conditionally show content
   return (
     <div className="weather-map" ref={mapRef}>
       <h3>Weather Map</h3>
@@ -224,19 +209,29 @@ const WeatherMap = ({ weather, forecast, city }) => {
         Using: {coordinates.lat}, {coordinates.lng}
       </div>
       
-      <div className="map-container">
-        <div className="map" />
-      </div>
-      <div className="map-legend">
-        <div className="legend-item">
-          <div className="legend-marker weather-marker"></div>
-          <span>Current Weather</span>
+      {/* Show loading state or map based on coordinates */}
+      {!coordinates.lat || !coordinates.lng ? (
+        <div className="map-loading">
+          <p>Loading map coordinates...</p>
+          <p>Debug: lat={coordinates.lat}, lng={coordinates.lng}</p>
         </div>
-        <div className="legend-item">
-          <div className="legend-marker forecast-marker"></div>
-          <span>3-Day Forecast</span>
-        </div>
-      </div>
+      ) : (
+        <>
+          <div className="map-container">
+            <div className="map" />
+          </div>
+          <div className="map-legend">
+            <div className="legend-item">
+              <div className="legend-marker weather-marker"></div>
+              <span>Current Weather</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-marker forecast-marker"></div>
+              <span>3-Day Forecast</span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
