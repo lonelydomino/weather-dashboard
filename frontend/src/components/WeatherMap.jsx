@@ -16,11 +16,21 @@ const WeatherMap = ({ weather, forecast, city }) => {
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
 
   useEffect(() => {
-    if (!weather || !mapRef.current) return;
+    console.log('=== WeatherMap useEffect triggered ===');
+    console.log('Weather:', weather);
+    console.log('Map ref:', mapRef.current);
+    
+    if (!weather || !mapRef.current) {
+      console.log('Early return - weather:', !!weather, 'mapRef:', !!mapRef.current);
+      return;
+    }
 
     // Debug: Log the weather data to see what we're getting
     console.log('Weather data for map:', weather);
     console.log('Coordinates:', weather.coordinates);
+    console.log('Weather.coordinates type:', typeof weather.coordinates);
+    console.log('Weather.coordinates.lat type:', typeof weather.coordinates?.lat);
+    console.log('Weather.coordinates.lon type:', typeof weather.coordinates?.lon);
     console.log('Map ref current:', mapRef.current);
 
     // Initialize map if it doesn't exist
