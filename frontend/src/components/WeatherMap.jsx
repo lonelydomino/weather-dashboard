@@ -17,6 +17,10 @@ const WeatherMap = ({ weather, forecast, city }) => {
   useEffect(() => {
     if (!weather || !mapRef.current) return;
 
+    // Debug: Log the weather data to see what we're getting
+    console.log('Weather data for map:', weather);
+    console.log('Coordinates:', weather.coordinates);
+
     // Initialize map if it doesn't exist
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = L.map(mapRef.current).setView([0, 0], 10);
@@ -37,15 +41,26 @@ const WeatherMap = ({ weather, forecast, city }) => {
 
     // Get coordinates from weather data
     let lat, lng;
-    if (weather.coordinates) {
-      lat = weather.coordinates.lat;
-      lng = weather.coordinates.lon;
-    } else if (weather.city && weather.country) {
+    if (weather.coordinates && weather.coordinates.lat && weather.coordinates.lon) {
+      lat = parseFloat(weather.coordinates.lat);
+      lng = parseFloat(weather.coordinates.lon);
+      console.log('Using API coordinates:', lat, lng);
+    } else {
+      console.log('No coordinates from API, using fallback');
       // Fallback: Try to get coordinates from city name
       // For now, we'll use some default coordinates
       lat = 40.7128; // Default to NYC coordinates
       lng = -74.0060;
     }
+
+    // Additional validation for coordinates
+    if (isNaN(lat) || isNaN(lng)) {
+      console.log('Invalid coordinates, using fallback');
+      lat = 40.7128;
+      lng = -74.0060;
+    }
+
+    console.log('Final coordinates for map:', lat, lng);
 
     if (lat && lng) {
       // Set map view to the city
@@ -140,6 +155,15 @@ const WeatherMap = ({ weather, forecast, city }) => {
   return (
     <div className="weather-map">
       <h3>Weather Map</h3>
+      
+      {/* Debug info - remove this after fixing */}
+      <div className="debug-info" style={{background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '10px', fontSize: '12px'}}>
+        <strong>Debug Info:</strong><br/>
+        City: {weather?.city}<br/>
+        Coordinates: {weather?.coordinates ? `${weather.coordinates.lat}, ${weather.coordinates.lon}` : 'None'}<br/>
+        Using: {lat}, {lng}
+      </div>
+      
       <div className="map-container">
         <div ref={mapRef} className="map" />
       </div>
