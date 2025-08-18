@@ -28,7 +28,14 @@ const WeatherMap = ({ weather, forecast, city }) => {
     // Wait for the ref to be ready
     if (!mapRef.current) {
       console.log('Map ref not ready, waiting...');
-      return;
+      // Use a timeout to wait for the ref to be attached
+      const timer = setTimeout(() => {
+        if (mapRef.current) {
+          console.log('Ref is now ready, re-triggering effect');
+          setCoordinates(prev => ({ ...prev }));
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
 
     // Debug: Log the weather data to see what we're getting
