@@ -120,10 +120,10 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
     maintainAspectRatio: false,
     layout: {
       padding: {
-        top: 10,
-        right: 10,
-        bottom: 10,
-        left: 10
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
       }
     },
     plugins: {
@@ -132,11 +132,11 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         labels: {
           color: '#f8f9fa',
           font: {
-            size: 12,
+            size: 14,
             weight: 'bold'
           },
           usePointStyle: true,
-          padding: 15
+          padding: 20
         }
       },
       tooltip: {
@@ -163,7 +163,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         ticks: {
           color: '#f8f9fa',
           font: {
-            size: 11
+            size: 12
           }
         }
       },
@@ -175,7 +175,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         ticks: {
           color: '#f8f9fa',
           font: {
-            size: 11
+            size: 12
           },
           callback: function(value) {
             return value + (temperatureUnit === 'celsius' ? '°C' : '°F');
