@@ -21,9 +21,11 @@ const WeatherMap = ({ weather, forecast, city }) => {
     // Debug: Log the weather data to see what we're getting
     console.log('Weather data for map:', weather);
     console.log('Coordinates:', weather.coordinates);
+    console.log('Map ref current:', mapRef.current);
 
     // Initialize map if it doesn't exist
     if (!mapInstanceRef.current) {
+      console.log('Initializing new map...');
       mapInstanceRef.current = L.map(mapRef.current).setView([0, 0], 10);
       
       // Add OpenStreetMap tiles
@@ -31,6 +33,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 18,
       }).addTo(mapInstanceRef.current);
+      console.log('Map initialized successfully');
     }
 
     // Clear existing markers
@@ -65,10 +68,13 @@ const WeatherMap = ({ weather, forecast, city }) => {
     
     // Update coordinates state
     setCoordinates({ lat: tempLat, lng: tempLng });
+    console.log('Coordinates state updated:', { lat: tempLat, lng: tempLng });
 
     if (tempLat && tempLng) {
+      console.log('Setting map view to:', tempLat, tempLng);
       // Set map view to the city
       mapInstanceRef.current.setView([tempLat, tempLng], 12);
+      console.log('Map view updated successfully');
 
       // Create custom weather icon
       const weatherIcon = L.divIcon({
@@ -156,17 +162,24 @@ const WeatherMap = ({ weather, forecast, city }) => {
 
   if (!weather) return null;
   
+  // Debug the loading condition
+  console.log('Render check - weather:', !!weather, 'coordinates:', coordinates, 'lat:', coordinates.lat, 'lng:', coordinates.lng);
+  
   // Don't render map if coordinates are not available
   if (!coordinates.lat || !coordinates.lng) {
+    console.log('Showing loading state - coordinates not ready');
     return (
       <div className="weather-map">
         <h3>Weather Map</h3>
         <div className="map-loading">
           <p>Loading map coordinates...</p>
+          <p>Debug: lat={coordinates.lat}, lng={coordinates.lng}</p>
         </div>
       </div>
     );
   }
+  
+  console.log('Rendering map with coordinates:', coordinates.lat, coordinates.lng);
 
   return (
     <div className="weather-map">
