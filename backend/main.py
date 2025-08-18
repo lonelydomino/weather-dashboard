@@ -114,7 +114,7 @@ async def get_forecast(city: str, days: int = 7):
                     forecast_data.append({
                         "date": day["date"],
                         "max_temp_c": day["day"]["maxtemp_c"],
-                        "min_temp_c": day["day"]["mintemp_f"],
+                        "min_temp_c": day["day"]["mintemp_c"],
                         "max_temp_f": day["day"]["maxtemp_f"],
                         "min_temp_f": day["day"]["mintemp_f"],
                         "condition": day["day"]["condition"]["text"],
