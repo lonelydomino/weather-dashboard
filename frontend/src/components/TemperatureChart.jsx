@@ -23,7 +23,7 @@ ChartJS.register(
   Filler
 );
 
-const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
+const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {

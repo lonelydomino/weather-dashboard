@@ -11,7 +11,7 @@ function App() {
   const [error, setError] = useState('');
   const [locationPermission, setLocationPermission] = useState('prompt');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-  const [temperatureUnit, setTemperatureUnit] = useState('celsius'); // 'celsius' or 'fahrenheit'
+  const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>('fahrenheit');
 
   // Check location permission on component mount
   useEffect(() => {
