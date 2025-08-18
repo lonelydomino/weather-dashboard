@@ -33,43 +33,26 @@ const WeatherMap = ({ weather, forecast, city }) => {
   };
 
   useEffect(() => {
-    console.log('=== WeatherMap useEffect triggered ===');
-    console.log('Weather:', weather);
-    console.log('Map ref:', mapRef.current);
-    
     if (!weather) {
-      console.log('Early return - no weather data');
       return;
     }
     
     // Wait for the ref to be ready
     if (!mapRef.current) {
-      console.log('Map ref not ready, waiting...');
       // Use a timeout to wait for the ref to be attached
       const timer = setTimeout(() => {
         if (mapRef.current) {
-          console.log('Ref is now ready, re-triggering effect');
           setCoordinates(prev => ({ ...prev }));
         }
       }, 100);
       return () => clearTimeout(timer);
     }
 
-    // Debug: Log the weather data to see what we're getting
-    console.log('Weather data for map:', weather);
-    console.log('Coordinates:', weather.coordinates);
-    console.log('Weather.coordinates type:', typeof weather.coordinates);
-    console.log('Weather.coordinates.lat type:', typeof weather.coordinates?.lat);
-    console.log('Weather.coordinates.lon type:', typeof weather.coordinates?.lon);
-    console.log('Map ref current:', mapRef.current);
-
     // Initialize map if it doesn't exist
     if (!mapInstanceRef.current) {
-      console.log('Initializing new map...');
       // Find the map div within the ref container
       const mapElement = mapRef.current.querySelector('.map');
       if (!mapElement) {
-        console.log('Map element not found');
         return;
       }
       mapInstanceRef.current = L.map(mapElement).setView([0, 0], 10);
@@ -79,7 +62,6 @@ const WeatherMap = ({ weather, forecast, city }) => {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 18,
       }).addTo(mapInstanceRef.current);
-      console.log('Map initialized successfully');
     }
 
     // Clear existing markers
@@ -94,9 +76,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
     if (weather.coordinates && weather.coordinates.lat && weather.coordinates.lon) {
       tempLat = parseFloat(weather.coordinates.lat);
       tempLng = parseFloat(weather.coordinates.lon);
-      console.log('Using API coordinates:', tempLat, tempLng);
     } else {
-      console.log('No coordinates from API, using fallback');
       // Fallback: Try to get coordinates from city name
       // For now, we'll use some default coordinates
       tempLat = 40.7128; // Default to NYC coordinates
@@ -105,22 +85,16 @@ const WeatherMap = ({ weather, forecast, city }) => {
 
     // Additional validation for coordinates
     if (isNaN(tempLat) || isNaN(tempLng)) {
-      console.log('Invalid coordinates, using fallback');
       tempLat = 40.7128;
       tempLng = -74.0060;
     }
-
-    console.log('Final coordinates for map:', tempLat, tempLng);
     
     // Update coordinates state
     setCoordinates({ lat: tempLat, lng: tempLng });
-    console.log('Coordinates state updated:', { lat: tempLat, lng: tempLng });
 
     if (tempLat && tempLng) {
-      console.log('Setting map view to:', tempLat, tempLng);
       // Set map view to the city
       mapInstanceRef.current.setView([tempLat, tempLng], 12);
-      console.log('Map view updated successfully');
 
       // Create custom weather icon
       const weatherIcon = L.divIcon({
@@ -212,26 +186,16 @@ const WeatherMap = ({ weather, forecast, city }) => {
   if (!weather) return null;
   
   // Debug the loading condition
-  console.log('Render check - weather:', !!weather, 'coordinates:', coordinates, 'lat:', coordinates.lat, 'lng:', coordinates.lng);
   
   // Always render the container with ref, but conditionally show content
   return (
     <div className="weather-map" ref={mapRef}>
       <h3>Weather Map</h3>
       
-      {/* Debug info - remove this after fixing */}
-      <div className="debug-info" style={{background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', marginBottom: '10px', fontSize: '12px'}}>
-        <strong>Debug Info:</strong><br/>
-        City: {weather?.city}<br/>
-        Coordinates: {weather?.coordinates ? `${weather.coordinates.lat}, ${weather.coordinates.lon}` : 'None'}<br/>
-        Using: {coordinates.lat}, {coordinates.lng}
-      </div>
-      
       {/* Show loading state or map based on coordinates */}
       {!coordinates.lat || !coordinates.lng ? (
         <div className="map-loading">
           <p>Loading map coordinates...</p>
-          <p>Debug: lat={coordinates.lat}, lng={coordinates.lng}</p>
         </div>
       ) : null}
       
