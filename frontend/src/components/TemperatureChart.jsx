@@ -23,7 +23,7 @@ ChartJS.register(
   Filler
 );
 
-const TemperatureChart = ({ forecastData }) => {
+const TemperatureChart = ({ forecastData, temperatureUnit = 'celsius' }) => {
   if (!forecastData || forecastData.length === 0) {
     return null;
   }
@@ -38,14 +38,18 @@ const TemperatureChart = ({ forecastData }) => {
     });
   });
 
-  const maxTemps = forecastData.map(day => day.max_temp_c);
-  const minTemps = forecastData.map(day => day.min_temp_c);
+  const maxTemps = forecastData.map(day => 
+    temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f
+  );
+  const minTemps = forecastData.map(day => 
+    temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f
+  );
 
   const data = {
     labels: dates,
     datasets: [
       {
-        label: 'High Temperature (°C)',
+        label: `High Temperature (${temperatureUnit === 'celsius' ? '°C' : '°F'})`,
         data: maxTemps,
         borderColor: '#ff6b6b',
         backgroundColor: 'rgba(255, 107, 107, 0.1)',
@@ -59,7 +63,7 @@ const TemperatureChart = ({ forecastData }) => {
         pointHoverRadius: 8,
       },
       {
-        label: 'Low Temperature (°C)',
+        label: `Low Temperature (${temperatureUnit === 'celsius' ? '°C' : '°F'})`,
         data: minTemps,
         borderColor: '#4ecdc4',
         backgroundColor: 'rgba(78, 205, 196, 0.1)',
@@ -130,7 +134,7 @@ const TemperatureChart = ({ forecastData }) => {
             size: 12
           },
           callback: function(value) {
-            return value + '°C';
+            return value + (temperatureUnit === 'celsius' ? '°C' : '°F');
           }
         }
       }

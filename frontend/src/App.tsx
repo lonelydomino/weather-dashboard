@@ -11,6 +11,7 @@ function App() {
   const [error, setError] = useState('');
   const [locationPermission, setLocationPermission] = useState('prompt');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [temperatureUnit, setTemperatureUnit] = useState('celsius'); // 'celsius' or 'fahrenheit'
 
   // Check location permission on component mount
   useEffect(() => {
@@ -112,6 +113,22 @@ function App() {
       <header className="App-header">
         <h1>🌤️ Weather Dashboard</h1>
         
+        {/* Temperature Unit Toggle */}
+        <div className="temperature-toggle">
+          <button 
+            onClick={() => setTemperatureUnit('celsius')}
+            className={`toggle-button ${temperatureUnit === 'celsius' ? 'active' : ''}`}
+          >
+            °C
+          </button>
+          <button 
+            onClick={() => setTemperatureUnit('fahrenheit')}
+            className={`toggle-button ${temperatureUnit === 'fahrenheit' ? 'active' : ''}`}
+          >
+            °F
+          </button>
+        </div>
+        
         {/* Location Detection Section */}
         <div className="location-section">
           <button 
@@ -167,7 +184,10 @@ function App() {
             <h2>{weather.city}, {weather.country}</h2>
             <div className="weather-info">
               <div className="temperature">
-                {weather.current.temperature_c}°C / {weather.current.temperature_f}°F
+                {temperatureUnit === 'celsius' 
+                  ? `${weather.current.temperature_c}°C` 
+                  : `${weather.current.temperature_f}°F`
+                }
               </div>
               <div className="condition">
                 {weather.current.condition}
@@ -175,7 +195,10 @@ function App() {
               <div className="details">
                 <p>Humidity: {weather.current.humidity}%</p>
                 <p>Wind: {weather.current.wind_speed_kph} km/h</p>
-                <p>Feels like: {weather.current.feels_like_c}°C</p>
+                <p>Feels like: {temperatureUnit === 'celsius' 
+                  ? `${weather.current.feels_like_c}°C` 
+                  : `${weather.current.feels_like_f}°F`
+                }</p>
                 <p>Pressure: {weather.current.pressure_mb} mb</p>
                 <p>UV Index: {weather.current.uv_index}</p>
               </div>
@@ -186,7 +209,7 @@ function App() {
         {/* Charts Section */}
         {forecast && forecast.length > 0 && (
           <div className="charts-section">
-            <TemperatureChart forecastData={forecast} />
+            <TemperatureChart forecastData={forecast} temperatureUnit={temperatureUnit} />
             <PrecipitationChart forecastData={forecast} />
           </div>
         )}
