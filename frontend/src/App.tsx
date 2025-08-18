@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { TemperatureChart, PrecipitationChart, WeatherMap } from './components'
+import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon } from './components'
 
 function App() {
   // State variables to store our data
@@ -190,7 +190,7 @@ function App() {
                 }
               </div>
               <div className="condition">
-                {weather.current.condition}
+                <WeatherIcon condition={weather.current.condition} />
               </div>
               <div className="details">
                 <p>Humidity: {weather.current.humidity}%</p>

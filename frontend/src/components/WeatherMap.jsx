@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import WeatherIcon from './WeatherIcon';
 
 // Fix for default markers in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -14,6 +15,22 @@ const WeatherMap = ({ weather, forecast, city }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+
+  // Function to get weather icon for map markers
+  const getWeatherIcon = (weatherCondition) => {
+    const conditionLower = weatherCondition.toLowerCase();
+    
+    if (conditionLower.includes('sunny') || conditionLower.includes('clear')) return '☀️';
+    if (conditionLower.includes('cloudy') || conditionLower.includes('overcast')) return '☁️';
+    if (conditionLower.includes('rain') || conditionLower.includes('drizzle')) return '🌧️';
+    if (conditionLower.includes('thunder') || conditionLower.includes('storm')) return '⛈️';
+    if (conditionLower.includes('snow') || conditionLower.includes('sleet')) return '❄️';
+    if (conditionLower.includes('fog') || conditionLower.includes('mist')) return '🌫️';
+    if (conditionLower.includes('partly cloudy') || conditionLower.includes('scattered')) return '⛅';
+    if (conditionLower.includes('windy') || conditionLower.includes('breezy')) return '💨';
+    
+    return '🌤️';
+  };
 
   useEffect(() => {
     console.log('=== WeatherMap useEffect triggered ===');
@@ -111,7 +128,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
         html: `
           <div class="marker-content">
             <div class="marker-temp">${Math.round(weather.current.temperature_c)}°C</div>
-            <div class="marker-condition">${weather.current.condition}</div>
+            <div class="marker-weather-icon">${getWeatherIcon(weather.current.condition)}</div>
           </div>
         `,
         iconSize: [80, 60],
@@ -149,10 +166,11 @@ const WeatherMap = ({ weather, forecast, city }) => {
                 <div class="forecast-marker-content">
                   <div class="forecast-date">${new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</div>
                   <div class="forecast-temp">${Math.round(day.max_temp_c)}°</div>
+                  <div class="forecast-weather-icon">${getWeatherIcon(day.condition)}</div>
                 </div>
               `,
-              iconSize: [60, 40],
-              iconAnchor: [30, 20],
+              iconSize: [60, 50],
+              iconAnchor: [30, 25],
             });
 
             // Offset forecast markers slightly
