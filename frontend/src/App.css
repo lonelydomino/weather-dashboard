@@ -25,6 +25,51 @@ h1 {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
+/* Location Section */
+.location-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.location-button {
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.location-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.location-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.location-info {
+  text-align: center;
+}
+
+.location-hint {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
 /* Search Section */
 .search-section {
   display: flex;
@@ -215,6 +260,11 @@ h1 {
     font-size: 2rem;
   }
   
+  .location-button {
+    padding: 10px 25px;
+    font-size: 1rem;
+  }
+  
   .city-input {
     width: 250px;
   }
@@ -226,5 +276,40 @@ h1 {
   
   .weather-display {
     margin: 0 1rem;
+  }
+  
+  .charts-section {
+    margin: 1rem;
+    gap: 1.5rem;
+  }
+  
+  .temperature-chart,
+  .precipitation-chart {
+    padding: 1.5rem;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+  
+  .temperature-chart h3,
+  .precipitation-chart h3 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .location-button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+  
+  .temperature-chart,
+  .precipitation-chart {
+    padding: 1rem;
   }
 }

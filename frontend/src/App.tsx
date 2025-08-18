@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { TemperatureChart, PrecipitationChart } from './components'
 
@@ -9,17 +9,79 @@ function App() {
   const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [locationPermission, setLocationPermission] = useState('prompt');
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
-  // Function to fetch weather data from our backend
-  const fetchWeather = async () => {
-    if (!city.trim()) return;
-    
+  // Check location permission on component mount
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        setLocationPermission(result.state);
+      });
+    }
+  }, []);
+
+  // Function to get weather by coordinates
+  const getWeatherByCoordinates = async (lat: number, lon: number) => {
     setLoading(true);
     setError('');
     
     try {
+      // Use coordinates directly with weather API
+      const coordinates = `${lat},${lon}`;
+      await fetchWeatherData(coordinates);
+    } catch (err) {
+      setError('Failed to get weather for your location');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to detect user's location
+  const detectLocation = () => {
+    if (!('geolocation' in navigator)) {
+      setError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setError('');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        getWeatherByCoordinates(latitude, longitude);
+        setIsDetectingLocation(false);
+      },
+      (error) => {
+        setIsDetectingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setError('Location access denied. Please enable location permissions or search manually.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setError('Location information unavailable. Please search manually.');
+            break;
+          case error.TIMEOUT:
+            setError('Location request timed out. Please try again or search manually.');
+            break;
+          default:
+            setError('An error occurred while getting your location. Please search manually.');
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  };
+
+  // Function to fetch weather data (extracted from fetchWeather)
+  const fetchWeatherData = async (cityName: string) => {
+    try {
       // Fetch current weather
-      const weatherResponse = await fetch(`http://localhost:8000/api/weather/current/${city}`);
+      const weatherResponse = await fetch(`http://localhost:8000/api/weather/current/${cityName}`);
       if (weatherResponse.ok) {
         const weatherData = await weatherResponse.json();
         setWeather(weatherData);
@@ -29,22 +91,49 @@ function App() {
       }
 
       // Fetch forecast data
-      const forecastResponse = await fetch(`http://localhost:8000/api/weather/forecast/${city}`);
+      const forecastResponse = await fetch(`http://localhost:8000/api/weather/forecast/${cityName}`);
       if (forecastResponse.ok) {
         const forecastData = await forecastResponse.json();
         setForecast(forecastData.forecast);
       }
     } catch (err) {
       setError('Failed to fetch weather data. Is the backend running?');
-    } finally {
-      setLoading(false);
     }
+  };
+
+  // Function to fetch weather data from search
+  const fetchWeather = async () => {
+    if (!city.trim()) return;
+    await fetchWeatherData(city);
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>🌤️ Weather Dashboard</h1>
+        
+        {/* Location Detection Section */}
+        <div className="location-section">
+          <button 
+            onClick={detectLocation}
+            disabled={isDetectingLocation || loading}
+            className="location-button"
+          >
+            {isDetectingLocation ? '📍 Detecting...' : '📍 Use My Location'}
+          </button>
+          <div className="location-info">
+            {isDetectingLocation && (
+              <small className="location-hint">
+                Getting your location...
+              </small>
+            )}
+            {locationPermission === 'denied' && !isDetectingLocation && (
+              <small className="location-hint">
+                Location access denied. You can still search for cities manually.
+              </small>
+            )}
+          </div>
+        </div>
         
         {/* Search Section */}
         <div className="search-section">
