@@ -81,6 +81,14 @@ const PrecipitationChart = ({ forecast }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+      }
+    },
     plugins: {
       legend: {
         position: 'top',
@@ -127,9 +135,6 @@ const PrecipitationChart = ({ forecast }) => {
         }
       },
       y: {
-        type: 'linear',
-        display: true,
-        position: 'left',
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
           borderColor: 'rgba(255, 255, 255, 0.2)'
@@ -138,18 +143,6 @@ const PrecipitationChart = ({ forecast }) => {
           color: '#f8f9fa',
           font: {
             size: 12
-          },
-          callback: function(value) {
-            return value + 'mm';
-          }
-        },
-        title: {
-          display: true,
-          text: 'Precipitation (mm)',
-          color: '#f8f9fa',
-          font: {
-            size: 14,
-            weight: 'bold'
           }
         }
       },
@@ -164,18 +157,6 @@ const PrecipitationChart = ({ forecast }) => {
           color: '#f8f9fa',
           font: {
             size: 12
-          },
-          callback: function(value) {
-            return value + ' km/h';
-          }
-        },
-        title: {
-          display: true,
-          text: 'Wind Speed (km/h)',
-          color: '#f8f9fa',
-          font: {
-            size: 14,
-            weight: 'bold'
           }
         }
       }
@@ -188,7 +169,7 @@ const PrecipitationChart = ({ forecast }) => {
 
   return (
     <div className="precipitation-chart">
-      <h3>Precipitation & Wind Forecast</h3>
+      <h3>7-Day Precipitation & Wind Forecast</h3>
       <div className="chart-container">
         <Bar data={data} options={options} />
       </div>

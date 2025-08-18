@@ -99,6 +99,14 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+      }
+    },
     plugins: {
       legend: {
         position: 'top',
@@ -122,7 +130,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
         displayColors: true,
         callbacks: {
           label: function(context) {
-            return `${context.dataset.label}: ${context.parsed.y}°C`;
+            return `${context.dataset.label}: ${context.parsed.y}°${temperatureUnit === 'celsius' ? 'C' : 'F'}`;
           }
         }
       }
