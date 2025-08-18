@@ -41,34 +41,34 @@ const WeatherMap = ({ weather, forecast, city }) => {
     });
 
     // Get coordinates from weather data
-    let lat, lng;
+    let tempLat, tempLng;
     if (weather.coordinates && weather.coordinates.lat && weather.coordinates.lon) {
-      lat = parseFloat(weather.coordinates.lat);
-      lng = parseFloat(weather.coordinates.lon);
-      console.log('Using API coordinates:', lat, lng);
+      tempLat = parseFloat(weather.coordinates.lat);
+      tempLng = parseFloat(weather.coordinates.lon);
+      console.log('Using API coordinates:', tempLat, tempLng);
     } else {
       console.log('No coordinates from API, using fallback');
       // Fallback: Try to get coordinates from city name
       // For now, we'll use some default coordinates
-      lat = 40.7128; // Default to NYC coordinates
-      lng = -74.0060;
+      tempLat = 40.7128; // Default to NYC coordinates
+      tempLng = -74.0060;
     }
 
     // Additional validation for coordinates
-    if (isNaN(lat) || isNaN(lng)) {
+    if (isNaN(tempLat) || isNaN(tempLng)) {
       console.log('Invalid coordinates, using fallback');
-      lat = 40.7128;
-      lng = -74.0060;
+      tempLat = 40.7128;
+      tempLng = -74.0060;
     }
 
-    console.log('Final coordinates for map:', lat, lng);
+    console.log('Final coordinates for map:', tempLat, tempLng);
     
     // Update coordinates state
-    setCoordinates({ lat, lng });
+    setCoordinates({ lat: tempLat, lng: tempLng });
 
-    if (lat && lng) {
+    if (tempLat && tempLng) {
       // Set map view to the city
-      mapInstanceRef.current.setView([lat, lng], 12);
+      mapInstanceRef.current.setView([tempLat, tempLng], 12);
 
       // Create custom weather icon
       const weatherIcon = L.divIcon({
@@ -84,7 +84,7 @@ const WeatherMap = ({ weather, forecast, city }) => {
       });
 
       // Add weather marker
-      const marker = L.marker([lat, lng], { icon: weatherIcon }).addTo(mapInstanceRef.current);
+      const marker = L.marker([tempLat, tempLng], { icon: weatherIcon }).addTo(mapInstanceRef.current);
 
       // Add popup with weather details
       const popupContent = `
@@ -121,8 +121,8 @@ const WeatherMap = ({ weather, forecast, city }) => {
             });
 
             // Offset forecast markers slightly
-            const offsetLat = lat + (index + 1) * 0.01;
-            const forecastMarker = L.marker([offsetLat, lng], { icon: forecastIcon }).addTo(mapInstanceRef.current);
+            const offsetLat = coordinates.lat + (index + 1) * 0.01;
+            const forecastMarker = L.marker([offsetLat, coordinates.lng], { icon: forecastIcon }).addTo(mapInstanceRef.current);
             
             const forecastPopup = `
               <div class="forecast-popup">
