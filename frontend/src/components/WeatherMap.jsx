@@ -215,22 +215,25 @@ const WeatherMap = ({ weather, forecast, city }) => {
           <p>Loading map coordinates...</p>
           <p>Debug: lat={coordinates.lat}, lng={coordinates.lng}</p>
         </div>
-      ) : (
-        <>
-          <div className="map-container">
-            <div className="map" />
+      ) : null}
+      
+      {/* Always render map container so it can be found */}
+      <div className="map-container">
+        <div className="map" />
+      </div>
+      
+      {/* Show legend only when coordinates are available */}
+      {coordinates.lat && coordinates.lng && (
+        <div className="map-legend">
+          <div className="legend-item">
+            <div className="legend-marker weather-marker"></div>
+            <span>Current Weather</span>
           </div>
-          <div className="map-legend">
-            <div className="legend-item">
-              <div className="legend-marker weather-marker"></div>
-              <span>Current Weather</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-marker forecast-marker"></div>
-              <span>3-Day Forecast</span>
-            </div>
+          <div className="legend-item">
+            <div className="legend-marker forecast-marker"></div>
+            <span>3-Day Forecast</span>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
