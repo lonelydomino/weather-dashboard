@@ -40,6 +40,9 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
   // Debug logging
   console.log('TemperatureChart - forecast data:', forecast);
   console.log('TemperatureChart - temperatureUnit:', temperatureUnit);
+  console.log('TemperatureChart - forecast type:', typeof forecast);
+  console.log('TemperatureChart - forecast is array:', Array.isArray(forecast));
+  console.log('TemperatureChart - first forecast item:', forecast?.[0]);
 
   // Extract dates and temperatures from forecast data
   const dates = forecast.map(day => {
@@ -51,12 +54,17 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
     });
   });
 
-  const maxTemps = forecast.map(day => 
-    temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f
-  );
-  const minTemps = forecast.map(day => 
-    temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f
-  );
+  const maxTemps = forecast.map(day => {
+    const temp = temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f;
+    console.log(`Day ${day.date}: max_temp_${temperatureUnit === 'celsius' ? 'c' : 'f'} = ${temp}`);
+    return temp;
+  });
+  
+  const minTemps = forecast.map(day => {
+    const temp = temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f;
+    console.log(`Day ${day.date}: min_temp_${temperatureUnit === 'celsius' ? 'c' : 'f'} = ${temp}`);
+    return temp;
+  });
 
   console.log('TemperatureChart - dates:', dates);
   console.log('TemperatureChart - maxTemps:', maxTemps);
@@ -95,6 +103,8 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
       }
     ]
   };
+
+  console.log('TemperatureChart - data object:', data);
 
   const options = {
     responsive: true,
