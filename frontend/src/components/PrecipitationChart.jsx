@@ -19,13 +19,25 @@ ChartJS.register(
   Legend
 );
 
-const PrecipitationChart = ({ forecastData }) => {
-  if (!forecastData || forecastData.length === 0) {
-    return null;
+const PrecipitationChart = ({ forecast }) => {
+  if (!forecast || forecast.length === 0) {
+    return (
+      <div className="precipitation-chart">
+        <h3>7-Day Precipitation & Wind Forecast</h3>
+        <div className="chart-container">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#f8f9fa' }}>
+            <p>No forecast data available</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
+  // Debug logging
+  console.log('PrecipitationChart - forecast data:', forecast);
+
   // Extract dates and precipitation data
-  const dates = forecastData.map(day => {
+  const dates = forecast.map(day => {
     const date = new Date(day.date);
     return date.toLocaleDateString('en-US', { 
       weekday: 'short', 
@@ -34,8 +46,12 @@ const PrecipitationChart = ({ forecastData }) => {
     });
   });
 
-  const precipitation = forecastData.map(day => day.precipitation_mm);
-  const maxWind = forecastData.map(day => day.max_wind_kph);
+  const precipitation = forecast.map(day => day.precipitation_mm);
+  const maxWind = forecast.map(day => day.max_wind_kph);
+
+  console.log('PrecipitationChart - dates:', dates);
+  console.log('PrecipitationChart - precipitation:', precipitation);
+  console.log('PrecipitationChart - maxWind:', maxWind);
 
   const data = {
     labels: dates,

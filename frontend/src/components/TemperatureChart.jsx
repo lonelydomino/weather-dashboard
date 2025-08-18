@@ -23,13 +23,26 @@ ChartJS.register(
   Filler
 );
 
-const TemperatureChart = ({ forecastData, temperatureUnit = 'celsius' }) => {
-  if (!forecastData || forecastData.length === 0) {
-    return null;
+const TemperatureChart = ({ forecast, temperatureUnit = 'celsius' }) => {
+  if (!forecast || forecast.length === 0) {
+    return (
+      <div className="temperature-chart">
+        <h3>7-Day Temperature Forecast</h3>
+        <div className="chart-container">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#f8f9fa' }}>
+            <p>No forecast data available</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
+  // Debug logging
+  console.log('TemperatureChart - forecast data:', forecast);
+  console.log('TemperatureChart - temperatureUnit:', temperatureUnit);
+
   // Extract dates and temperatures from forecast data
-  const dates = forecastData.map(day => {
+  const dates = forecast.map(day => {
     const date = new Date(day.date);
     return date.toLocaleDateString('en-US', { 
       weekday: 'short', 
@@ -38,12 +51,16 @@ const TemperatureChart = ({ forecastData, temperatureUnit = 'celsius' }) => {
     });
   });
 
-  const maxTemps = forecastData.map(day => 
+  const maxTemps = forecast.map(day => 
     temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f
   );
-  const minTemps = forecastData.map(day => 
+  const minTemps = forecast.map(day => 
     temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f
   );
+
+  console.log('TemperatureChart - dates:', dates);
+  console.log('TemperatureChart - maxTemps:', maxTemps);
+  console.log('TemperatureChart - minTemps:', minTemps);
 
   const data = {
     labels: dates,

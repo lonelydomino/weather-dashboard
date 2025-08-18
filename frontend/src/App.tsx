@@ -95,7 +95,9 @@ function App() {
       const forecastResponse = await fetch(`http://localhost:8000/api/weather/forecast/${cityName}`);
       if (forecastResponse.ok) {
         const forecastData = await forecastResponse.json();
+        console.log('Raw forecast response:', forecastData);
         setForecast(forecastData.forecast);
+        console.log('Set forecast state:', forecastData.forecast);
       }
     } catch (err) {
       setError('Failed to fetch weather data. Is the backend running?');
@@ -213,9 +215,11 @@ function App() {
         {forecast && (
           <section className="charts-section">
             <div className="chart-container">
+              {console.log('Rendering TemperatureChart with forecast:', forecast)}
               <TemperatureChart forecast={forecast} temperatureUnit={temperatureUnit} />
             </div>
             <div className="chart-container">
+              {console.log('Rendering PrecipitationChart with forecast:', forecast)}
               <PrecipitationChart forecast={forecast} />
             </div>
           </section>
