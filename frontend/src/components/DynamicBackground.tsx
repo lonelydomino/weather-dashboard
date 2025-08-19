@@ -112,11 +112,11 @@ const DynamicBackground = ({ weather, children }: DynamicBackgroundProps) => {
   }, [weather]);
 
   // Convert custom CSS properties to inline styles
-  const inlineStyles: React.CSSProperties = {
+  const inlineStyles: React.CSSProperties & { [key: string]: string | undefined } = {
     background: backgroundStyle.background,
-    '--overlay': backgroundStyle['--overlay'] as any,
-    '--sun-moon-position': backgroundStyle['--sun-moon-position'] as any,
-    '--sun-moon': backgroundStyle['--sun-moon'] as any
+    '--overlay': backgroundStyle['--overlay'],
+    '--sun-moon-position': backgroundStyle['--sun-moon-position'],
+    '--sun-moon': backgroundStyle['--sun-moon']
   };
 
   return (

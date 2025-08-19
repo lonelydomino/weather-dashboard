@@ -23,7 +23,7 @@ interface WeatherData {
     temperature_f: number;
     condition: string;
     humidity: number;
-    wind_speed_kph: number;
+    wind_kph: number;
     pressure_mb: number;
     uv: number;
     feels_like_c: number;
@@ -163,7 +163,7 @@ const WeatherMap = ({ weather, forecast, city }: WeatherMapProps) => {
             <div class="popup-condition">${weather.current.condition}</div>
             <div class="popup-details">
               <p>Humidity: ${weather.current.humidity}%</p>
-              <p>Wind: ${weather.current.wind_speed_kph} km/h</p>
+              <p>Wind: ${weather.current.wind_kph} km/h</p>
               <p>Feels like: ${weather.current.feels_like_f}°F</p>
             </div>
           </div>
@@ -189,26 +189,28 @@ const WeatherMap = ({ weather, forecast, city }: WeatherMapProps) => {
               iconAnchor: [30, 25],
             });
 
-            // Offset forecast markers slightly
-            const offsetLat = coordinates.lat + (index + 1) * 0.01;
-            const forecastMarker = L.marker([offsetLat, coordinates.lng], { icon: forecastIcon }).addTo(mapInstanceRef.current!);
-            
-            const forecastPopup = `
-              <div class="forecast-popup">
-                <h4>${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</h4>
-                <div class="forecast-popup-weather">
-                  <div class="forecast-popup-temp">High: ${day.max_temp_f}°F / Low: ${day.min_temp_f}°F</div>
-                  <div class="forecast-popup-condition">${day.condition}</div>
-                  <div class="forecast-popup-details">
-                    <p>Precipitation: ${day.precipitation_mm}mm</p>
-                    <p>Wind: ${day.max_wind_kph} km/h</p>
-                    <p>UV: ${day.uv}</p>
+            // Offset forecast markers slightly - ensure coordinates are not null
+            if (coordinates.lat && coordinates.lng) {
+              const offsetLat = coordinates.lat + (index + 1) * 0.01;
+              const forecastMarker = L.marker([offsetLat, coordinates.lng], { icon: forecastIcon }).addTo(mapInstanceRef.current!);
+              
+              const forecastPopup = `
+                <div class="forecast-popup">
+                  <h4>${new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</h4>
+                  <div class="forecast-popup-weather">
+                    <div class="forecast-popup-temp">High: ${day.max_temp_f}°F / Low: ${day.min_temp_f}°F</div>
+                    <div class="forecast-popup-condition">${day.condition}</div>
+                    <div class="forecast-popup-details">
+                      <p>Precipitation: ${day.precipitation_mm}mm</p>
+                      <p>Wind: ${day.max_wind_kph} km/h</p>
+                      <p>UV: ${day.uv}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            `;
+              `;
 
-            forecastMarker.bindPopup(forecastPopup);
+              forecastMarker.bindPopup(forecastPopup);
+            }
           }
         });
       }
