@@ -49,14 +49,22 @@ async def root():
 
 @app.get("/api/weather/current/{city}")
 async def get_current_weather(city: str):
-    """Get current weather for a city"""
+    """Get current weather for a city or coordinates"""
     try:
+        # Check if the input looks like coordinates (contains comma and numbers)
+        if ',' in city and any(char.isdigit() for char in city):
+            # This is coordinates, use them directly
+            query = city
+        else:
+            # This is a city name, use as is
+            query = city
+            
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{WEATHER_BASE_URL}/current.json",
                 params={
                     "key": WEATHER_API_KEY,
-                    "q": city,
+                    "q": query,
                     "aqi": "no"
                 },
                 timeout=10.0
@@ -78,10 +86,10 @@ async def get_current_weather(city: str):
                         "condition": data["current"]["condition"]["text"],
                         "icon": data["current"]["condition"]["icon"],
                         "humidity": data["current"]["humidity"],
-                        "wind_kph": data["current"]["wind_kph"],  # Fixed: match frontend expectation
+                        "wind_kph": data["current"]["wind_kph"],
                         "wind_direction": data["current"]["wind_degree"],
                         "pressure_mb": data["current"]["pressure_mb"],
-                        "uv": data["current"]["uv"],  # Fixed: match frontend expectation
+                        "uv": data["current"]["uv"],
                         "feels_like_c": data["current"]["feelslike_c"],
                         "feels_like_f": data["current"]["feelslike_f"]
                     },
@@ -100,17 +108,25 @@ async def get_current_weather(city: str):
 
 @app.get("/api/weather/forecast/{city}")
 async def get_forecast(city: str, days: int = 7):
-    """Get weather forecast for a city"""
+    """Get weather forecast for a city or coordinates"""
     if days < 1 or days > 14:
         days = 7
     
     try:
+        # Check if the input looks like coordinates (contains comma and numbers)
+        if ',' in city and any(char.isdigit() for char in city):
+            # This is coordinates, use them directly
+            query = city
+        else:
+            # This is a city name, use as is
+            query = city
+            
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{WEATHER_BASE_URL}/forecast.json",
                 params={
                     "key": WEATHER_API_KEY,
-                    "q": city,
+                    "q": query,
                     "days": days,
                     "aqi": "no"
                 },
@@ -132,7 +148,7 @@ async def get_forecast(city: str, days: int = 7):
                         "icon": day["day"]["condition"]["icon"],
                         "precipitation_mm": day["day"]["totalprecip_mm"],
                         "max_wind_kph": day["day"]["maxwind_kph"],
-                        "uv": day["day"]["uv"],  # Fixed: match frontend expectation
+                        "uv": day["day"]["uv"],
                         "sunrise": day["astro"]["sunrise"],
                         "sunset": day["astro"]["sunset"]
                     })
