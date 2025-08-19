@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground, SunriseSunsetTimeline } from './components'
+import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground } from './components'
 
 function App() {
   // State variables to store our data
@@ -211,13 +211,6 @@ function App() {
           </section>
         )}
 
-        {/* Sunrise Sunset Timeline */}
-        {forecast && forecast.length > 0 && (
-          <section className="sunrise-sunset-section">
-            <SunriseSunsetTimeline forecast={forecast} temperatureUnit={temperatureUnit} />
-          </section>
-        )}
-        
         {/* Charts Section */}
         {forecast && forecast.length > 0 && (
           <section className="charts-section">
