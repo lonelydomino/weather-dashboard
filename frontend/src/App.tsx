@@ -105,6 +105,7 @@ function App() {
       const weatherResponse = await fetch(API_ENDPOINTS.CURRENT_WEATHER(cityName));
       if (weatherResponse.ok) {
         const weatherData = await weatherResponse.json();
+        console.log('Weather data received:', weatherData);
         setWeather(weatherData);
       } else {
         console.error('City not found or weather data unavailable');
@@ -115,6 +116,8 @@ function App() {
       const forecastResponse = await fetch(API_ENDPOINTS.FORECAST(cityName));
       if (forecastResponse.ok) {
         const forecastData = await forecastResponse.json();
+        console.log('Forecast data received:', forecastData);
+        console.log('Forecast array:', forecastData.forecast);
         setForecast(forecastData.forecast);
       } else {
         console.error('Forecast response not ok:', forecastResponse.status, forecastResponse.statusText);
@@ -243,9 +246,11 @@ function App() {
         {forecast && forecast.length > 0 && (
           <section className="charts-section">
             <div className="chart-container">
+              {console.log('Rendering TemperatureChart with forecast:', forecast)}
               <TemperatureChart key={`temp-${city}-${temperatureUnit}`} forecast={forecast} temperatureUnit={temperatureUnit} />
             </div>
             <div className="chart-container">
+              {console.log('Rendering PrecipitationChart with forecast:', forecast)}
               <PrecipitationChart key={`precip-${city}`} forecast={forecast} />
             </div>
           </section>
