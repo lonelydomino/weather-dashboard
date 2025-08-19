@@ -2,13 +2,50 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground } from './components'
 
+// Type definitions
+interface WeatherData {
+  city: string;
+  country: string;
+  region: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  current: {
+    temperature_c: number;
+    temperature_f: number;
+    condition: string;
+    icon: string;
+    humidity: number;
+    wind_kph: number;
+    wind_direction: number;
+    pressure_mb: number;
+    uv: number;
+    feels_like_c: number;
+    feels_like_f: number;
+  };
+  last_updated: string;
+}
+
+interface ForecastData {
+  date: string;
+  max_temp_c: number;
+  min_temp_c: number;
+  max_temp_f: number;
+  min_temp_f: number;
+  condition: string;
+  icon: string;
+  precipitation_mm: number;
+  max_wind_kph: number;
+  uv: number;
+  sunrise: string;
+  sunset: string;
+}
+
 function App() {
-  // State variables to store our data
   const [city, setCity] = useState('');
-  const [weather, setWeather] = useState(null);
-  const [forecast, setForecast] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [forecast, setForecast] = useState<ForecastData[] | null>(null);
   const [locationPermission, setLocationPermission] = useState('prompt');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>('fahrenheit');
@@ -24,29 +61,27 @@ function App() {
 
   // Function to get weather by coordinates
   const getWeatherByCoordinates = async (lat: number, lon: number) => {
-    setLoading(true);
-    setError('');
-    
     try {
-      // Use coordinates directly with weather API
-      const coordinates = `${lat},${lon}`;
-      await fetchWeatherData(coordinates);
+      const response = await fetch(`http://localhost:8000/api/weather/current/${lat},${lon}`);
+      if (response.ok) {
+        const data = await response.json();
+        setWeather(data);
+      } else {
+        console.error('Failed to get weather for your location');
+      }
     } catch (err) {
-      setError('Failed to get weather for your location');
-    } finally {
-      setLoading(false);
+      console.error('Failed to fetch weather data for your location');
     }
   };
 
-  // Function to detect user's location
+  // Function to detect user location
   const detectLocation = () => {
     if (!('geolocation' in navigator)) {
-      setError('Geolocation is not supported by your browser');
+      console.error('Geolocation is not supported by this browser');
       return;
     }
 
     setIsDetectingLocation(true);
-    setError('');
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -55,30 +90,14 @@ function App() {
         setIsDetectingLocation(false);
       },
       (error) => {
+        console.error('Location error:', error);
+        setLocationPermission('denied');
         setIsDetectingLocation(false);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            setError('Location access denied. Please enable location permissions or search manually.');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            setError('Location information unavailable. Please search manually.');
-            break;
-          case error.TIMEOUT:
-            setError('Location request timed out. Please try again or search manually.');
-            break;
-          default:
-            setError('An error occurred while getting your location. Please search manually.');
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
       }
     );
   };
 
-  // Function to fetch weather data (extracted from fetchWeather)
+  // Function to fetch weather data
   const fetchWeatherData = async (cityName: string) => {
     try {
       // Fetch current weather
@@ -87,7 +106,7 @@ function App() {
         const weatherData = await weatherResponse.json();
         setWeather(weatherData);
       } else {
-        setError('City not found or weather data unavailable');
+        console.error('City not found or weather data unavailable');
         return;
       }
 
@@ -100,14 +119,22 @@ function App() {
         console.error('Forecast response not ok:', forecastResponse.status, forecastResponse.statusText);
       }
     } catch (err) {
-      setError('Failed to fetch weather data. Is the backend running?');
+      console.error('Failed to fetch weather data. Is the backend running?');
     }
   };
 
-  // Function to fetch weather data from search
-  const fetchWeather = async () => {
-    if (!city.trim()) return;
-    await fetchWeatherData(city);
+  // Function to handle search
+  const handleSearch = () => {
+    if (city.trim()) {
+      fetchWeatherData(city);
+    }
+  };
+
+  // Function to handle Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -142,9 +169,9 @@ function App() {
               onChange={(e) => setCity(e.target.value)}
               placeholder="Enter city name..."
               className="city-input"
-              onKeyPress={(e) => e.key === 'Enter' && fetchWeatherData()}
+              onKeyPress={handleKeyPress}
             />
-            <button onClick={fetchWeatherData} className="search-button">
+            <button onClick={handleSearch} className="search-button">
               Search
             </button>
             
@@ -236,5 +263,5 @@ function App() {
   );
 }
 
-export default App
+export default App;
 
