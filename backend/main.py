@@ -34,6 +34,51 @@ app.add_middleware(
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "demo_key")
 WEATHER_BASE_URL = "http://api.weatherapi.com/v1"
 
+@app.get("/test-api")
+async def test_weather_api():
+    """Test endpoint to check if Weather API is working"""
+    try:
+        print(f"Testing Weather API with key: {WEATHER_API_KEY[:10]}..." if WEATHER_API_KEY and len(WEATHER_API_KEY) > 10 else f"Testing Weather API with key: {WEATHER_API_KEY}")
+        
+        async with httpx.AsyncClient() as client:
+            # Test with a simple city
+            response = await client.get(
+                f"{WEATHER_BASE_URL}/current.json",
+                params={
+                    "key": WEATHER_API_KEY,
+                    "q": "London",
+                    "aqi": "no"
+                },
+                timeout=10.0
+            )
+            
+            print(f"Test API Response Status: {response.status_code}")
+            print(f"Test API Response: {response.text[:200]}...")
+            
+            if response.status_code == 200:
+                return {
+                    "status": "success",
+                    "message": "Weather API is working",
+                    "api_key_status": "valid",
+                    "test_response": response.json()
+                }
+            else:
+                return {
+                    "status": "error",
+                    "message": "Weather API returned error",
+                    "api_key_status": "invalid or expired",
+                    "status_code": response.status_code,
+                    "response": response.text
+                }
+                
+    except Exception as e:
+        print(f"Test API Exception: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Exception occurred: {str(e)}",
+            "api_key_status": "unknown"
+        }
+
 @app.get("/")
 async def root():
     """Health check endpoint"""
@@ -59,6 +104,11 @@ async def get_current_weather(city: str):
             # This is a city name, use as is
             query = city
             
+        # Debug logging
+        print(f"API Key: {WEATHER_API_KEY[:10]}..." if WEATHER_API_KEY and len(WEATHER_API_KEY) > 10 else f"API Key: {WEATHER_API_KEY}")
+        print(f"Query: {query}")
+        print(f"Full URL: {WEATHER_BASE_URL}/current.json")
+            
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{WEATHER_BASE_URL}/current.json",
@@ -69,6 +119,9 @@ async def get_current_weather(city: str):
                 },
                 timeout=10.0
             )
+            
+            print(f"Weather API Response Status: {response.status_code}")
+            print(f"Weather API Response: {response.text[:200]}...")
             
             if response.status_code == 200:
                 data = response.json()
@@ -96,14 +149,16 @@ async def get_current_weather(city: str):
                     "last_updated": data["current"]["last_updated"]
                 }
             else:
+                print(f"Weather API Error: {response.status_code} - {response.text}")
                 raise HTTPException(
                     status_code=400, 
-                    detail=f"Weather data not available for {city}"
+                    detail=f"Weather data not available for {city}. API Response: {response.text}"
                 )
                 
     except httpx.TimeoutException:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
+        print(f"Exception in get_current_weather: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching weather data: {str(e)}")
 
 @app.get("/api/weather/forecast/{city}")
