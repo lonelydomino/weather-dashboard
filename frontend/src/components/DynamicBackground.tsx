@@ -12,6 +12,7 @@ interface DynamicBackgroundProps {
 }
 
 interface BackgroundStyle {
+  background?: string;
   '--overlay'?: string;
   '--sun-moon-position'?: string;
   '--sun-moon'?: string;
@@ -110,8 +111,16 @@ const DynamicBackground = ({ weather, children }: DynamicBackgroundProps) => {
     setBackgroundStyle(getBackgroundStyle());
   }, [weather]);
 
+  // Convert custom CSS properties to inline styles
+  const inlineStyles: React.CSSProperties = {
+    background: backgroundStyle.background,
+    '--overlay': backgroundStyle['--overlay'] as any,
+    '--sun-moon-position': backgroundStyle['--sun-moon-position'] as any,
+    '--sun-moon': backgroundStyle['--sun-moon'] as any
+  };
+
   return (
-    <div className="dynamic-background" style={backgroundStyle}>
+    <div className="dynamic-background" style={inlineStyles}>
       <div className="background-overlay" style={{ background: backgroundStyle['--overlay'] }}></div>
       <div 
         className="sun-moon-icon" 

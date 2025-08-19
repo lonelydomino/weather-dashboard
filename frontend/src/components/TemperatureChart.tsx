@@ -121,7 +121,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }: Temperat
           color: '#f8f9fa',
           font: {
             size: 14,
-            weight: 'bold'
+            weight: 'bold' as const
           },
           usePointStyle: true,
           padding: 20

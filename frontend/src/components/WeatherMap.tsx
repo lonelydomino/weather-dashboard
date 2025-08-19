@@ -1,23 +1,63 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import WeatherIcon from './WeatherIcon';
 
 // Fix for default markers in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' }) => {
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+interface WeatherData {
+  city: string;
+  country: string;
+  region: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  current: {
+    temperature_c: number;
+    temperature_f: number;
+    condition: string;
+    humidity: number;
+    wind_speed_kph: number;
+    pressure_mb: number;
+    uv: number;
+    feels_like_c: number;
+    feels_like_f: number;
+  };
+  last_updated: string;
+}
+
+interface ForecastData {
+  date: string;
+  max_temp_c: number;
+  min_temp_c: number;
+  max_temp_f: number;
+  min_temp_f: number;
+  condition: string;
+  precipitation_mm: number;
+  max_wind_kph: number;
+  uv: number;
+}
+
+interface WeatherMapProps {
+  weather: WeatherData;
+  forecast: ForecastData[] | null;
+  city: string;
+  temperatureUnit?: 'celsius' | 'fahrenheit';
+}
+
+const WeatherMap = ({ weather, forecast, city }: WeatherMapProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const [coordinates, setCoordinates] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
 
   // Function to get weather icon for map markers
-  const getWeatherIcon = (weatherCondition) => {
+  const getWeatherIcon = (weatherCondition: string): string => {
     const conditionLower = weatherCondition.toLowerCase();
     
     if (conditionLower.includes('sunny') || conditionLower.includes('clear')) return '☀️';
@@ -51,7 +91,7 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
     // Initialize map if it doesn't exist
     if (!mapInstanceRef.current) {
       // Find the map div within the ref container
-      const mapElement = mapRef.current.querySelector('.map');
+      const mapElement = mapRef.current.querySelector('.map') as HTMLElement;
       if (!mapElement) {
         return;
       }
@@ -65,17 +105,19 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
     }
 
     // Clear existing markers
-    mapInstanceRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        mapInstanceRef.current.removeLayer(layer);
-      }
-    });
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.eachLayer((layer: L.Layer) => {
+        if (layer instanceof L.Marker) {
+          mapInstanceRef.current?.removeLayer(layer);
+        }
+      });
+    }
 
     // Get coordinates from weather data
-    let tempLat, tempLng;
+    let tempLat: number, tempLng: number;
     if (weather.coordinates && weather.coordinates.lat && weather.coordinates.lon) {
-      tempLat = parseFloat(weather.coordinates.lat);
-      tempLng = parseFloat(weather.coordinates.lon);
+      tempLat = parseFloat(weather.coordinates.lat.toString());
+      tempLng = parseFloat(weather.coordinates.lon.toString());
     } else {
       // Fallback: Try to get coordinates from city name
       // For now, we'll use some default coordinates
@@ -92,7 +134,7 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
     // Update coordinates state
     setCoordinates({ lat: tempLat, lng: tempLng });
 
-    if (tempLat && tempLng) {
+    if (tempLat && tempLng && mapInstanceRef.current) {
       // Set map view to the city
       mapInstanceRef.current.setView([tempLat, tempLng], 12);
 
@@ -131,8 +173,8 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
       marker.bindPopup(popupContent);
 
       // Add forecast markers if available
-      if (forecast && forecast.length > 0) {
-        forecast.forEach((day, index) => {
+      if (forecast && forecast.length > 0 && coordinates.lat && coordinates.lng) {
+        forecast.forEach((day: ForecastData, index: number) => {
           if (index < 3) { // Show next 3 days
             const forecastIcon = L.divIcon({
               className: 'forecast-marker',
@@ -149,7 +191,7 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
 
             // Offset forecast markers slightly
             const offsetLat = coordinates.lat + (index + 1) * 0.01;
-            const forecastMarker = L.marker([offsetLat, coordinates.lng], { icon: forecastIcon }).addTo(mapInstanceRef.current);
+            const forecastMarker = L.marker([offsetLat, coordinates.lng], { icon: forecastIcon }).addTo(mapInstanceRef.current!);
             
             const forecastPopup = `
               <div class="forecast-popup">
@@ -160,7 +202,7 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
                   <div class="forecast-popup-details">
                     <p>Precipitation: ${day.precipitation_mm}mm</p>
                     <p>Wind: ${day.max_wind_kph} km/h</p>
-                    <p>UV: ${day.uv_index}</p>
+                    <p>UV: ${day.uv}</p>
                   </div>
                 </div>
               </div>
@@ -179,13 +221,9 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
         mapInstanceRef.current = null;
       }
     };
-  }, [weather, forecast, city]);
+  }, [weather, forecast, city, coordinates.lat, coordinates.lng]);
   
-  // Remove the separate useEffect that was causing issues
-
   if (!weather) return null;
-  
-  // Debug the loading condition
   
   // Always render the container with ref, but conditionally show content
   return (
@@ -199,24 +237,10 @@ const WeatherMap = ({ weather, forecast, city, temperatureUnit = 'fahrenheit' })
         </div>
       ) : null}
       
-      {/* Always render map container so it can be found */}
+      {/* Map container */}
       <div className="map-container">
-        <div className="map" />
+        <div className="map"></div>
       </div>
-      
-      {/* Show legend only when coordinates are available */}
-      {coordinates.lat && coordinates.lng && (
-        <div className="map-legend">
-          <div className="legend-item">
-            <div className="legend-marker weather-marker"></div>
-            <span>Current Weather</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-marker forecast-marker"></div>
-            <span>3-Day Forecast</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
