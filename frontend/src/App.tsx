@@ -60,6 +60,23 @@ function App() {
     }
   }, []);
 
+  // Debug effect for forecast data
+  useEffect(() => {
+    if (forecast) {
+      console.log('Forecast state updated:', forecast);
+      console.log('Forecast length:', forecast.length);
+      console.log('First forecast item:', forecast[0]);
+    }
+  }, [forecast]);
+
+  // Debug effect for weather data
+  useEffect(() => {
+    if (weather) {
+      console.log('Weather state updated:', weather);
+      console.log('Weather city:', weather.city);
+    }
+  }, [weather]);
+
   // Function to get weather by coordinates
   const getWeatherByCoordinates = async (lat: number, lon: number) => {
     try {
@@ -246,11 +263,9 @@ function App() {
         {forecast && forecast.length > 0 && (
           <section className="charts-section">
             <div className="chart-container">
-              {console.log('Rendering TemperatureChart with forecast:', forecast)}
               <TemperatureChart key={`temp-${city}-${temperatureUnit}`} forecast={forecast} temperatureUnit={temperatureUnit} />
             </div>
             <div className="chart-container">
-              {console.log('Rendering PrecipitationChart with forecast:', forecast)}
               <PrecipitationChart key={`precip-${city}`} forecast={forecast} />
             </div>
           </section>
