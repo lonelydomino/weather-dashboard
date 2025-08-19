@@ -1,66 +1,26 @@
-import React from 'react';
+interface WeatherIconProps {
+  condition: string;
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  className?: string;
+}
 
-const WeatherIcon = ({ condition, size = 'large', className = '' }) => {
-  // Map weather conditions to appropriate icons
-  const getWeatherIcon = (weatherCondition) => {
+const WeatherIcon = ({ condition, size = 'large', className = '' }: WeatherIconProps) => {
+  const getWeatherIcon = (weatherCondition: string): string => {
     const conditionLower = weatherCondition.toLowerCase();
     
-    // Sunny/Clear conditions
-    if (conditionLower.includes('sunny') || conditionLower.includes('clear')) {
-      return '☀️';
-    }
+    if (conditionLower.includes('sunny') || conditionLower.includes('clear')) return '☀️';
+    if (conditionLower.includes('cloudy') || conditionLower.includes('overcast')) return '☁️';
+    if (conditionLower.includes('rain') || conditionLower.includes('drizzle')) return '🌧️';
+    if (conditionLower.includes('thunder') || conditionLower.includes('storm')) return '⛈️';
+    if (conditionLower.includes('snow') || conditionLower.includes('sleet')) return '❄️';
+    if (conditionLower.includes('fog') || conditionLower.includes('mist')) return '🌫️';
+    if (conditionLower.includes('partly cloudy') || conditionLower.includes('scattered')) return '⛅';
+    if (conditionLower.includes('windy') || conditionLower.includes('breezy')) return '💨';
     
-    // Cloudy conditions
-    if (conditionLower.includes('cloudy') || conditionLower.includes('overcast')) {
-      return '☁️';
-    }
-    
-    // Rainy conditions
-    if (conditionLower.includes('rain') || conditionLower.includes('drizzle') || conditionLower.includes('shower')) {
-      return '🌧️';
-    }
-    
-    // Stormy conditions
-    if (conditionLower.includes('thunder') || conditionLower.includes('storm')) {
-      return '⛈️';
-    }
-    
-    // Snowy conditions
-    if (conditionLower.includes('snow') || conditionLower.includes('sleet')) {
-      return '❄️';
-    }
-    
-    // Foggy/Misty conditions
-    if (conditionLower.includes('fog') || conditionLower.includes('mist') || conditionLower.includes('haze')) {
-      return '🌫️';
-    }
-    
-    // Partly cloudy
-    if (conditionLower.includes('partly cloudy') || conditionLower.includes('scattered clouds')) {
-      return '⛅';
-    }
-    
-    // Windy conditions
-    if (conditionLower.includes('windy') || conditionLower.includes('breezy')) {
-      return '💨';
-    }
-    
-    // Hot conditions
-    if (conditionLower.includes('hot') || conditionLower.includes('scorching')) {
-      return '🔥';
-    }
-    
-    // Cold conditions
-    if (conditionLower.includes('cold') || conditionLower.includes('freezing')) {
-      return '🥶';
-    }
-    
-    // Default fallback
     return '🌤️';
   };
 
-  // Get icon size classes
-  const getSizeClass = (iconSize) => {
+  const getSizeClass = (iconSize: string): string => {
     switch (iconSize) {
       case 'small':
         return 'weather-icon-small';

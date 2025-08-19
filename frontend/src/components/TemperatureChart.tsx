@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +11,6 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -23,79 +23,82 @@ ChartJS.register(
   Filler
 );
 
-const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
-  const chartRef = useRef(null);
+interface ForecastData {
+  date: string;
+  max_temp_c: number;
+  min_temp_c: number;
+  max_temp_f: number;
+  min_temp_f: number;
+  condition: string;
+}
+
+interface TemperatureChartProps {
+  forecast: ForecastData[];
+  temperatureUnit?: 'celsius' | 'fahrenheit';
+}
+
+const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }: TemperatureChartProps) => {
+  const chartRef = useRef<any>(null);
 
   useEffect(() => {
-    // Force chart update when data changes
     if (chartRef.current) {
-      // Chart ref updated, forcing re-render
+      chartRef.current.update();
     }
   }, [forecast, temperatureUnit]);
 
   if (!forecast || forecast.length === 0) {
     return (
       <div className="temperature-chart">
-        <h3>7-Day Temperature Forecast</h3>
-        <div className="chart-container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#f8f9fa' }}>
-            <p>No forecast data available</p>
-          </div>
+        <h3>Temperature Forecast</h3>
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          No forecast data available
         </div>
       </div>
     );
   }
 
-  // Extract dates and temperatures from forecast data
+  // Process forecast data
   const dates = forecast.map(day => {
     const date = new Date(day.date);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   });
 
   const maxTemps = forecast.map(day => {
-    const temp = temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f;
-    return temp;
+    return temperatureUnit === 'celsius' ? day.max_temp_c : day.max_temp_f;
   });
-  
+
   const minTemps = forecast.map(day => {
-    const temp = temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f;
-    return temp;
+    return temperatureUnit === 'celsius' ? day.min_temp_c : day.min_temp_f;
   });
 
   const data = {
     labels: dates,
     datasets: [
       {
-        label: `High Temperature (${temperatureUnit === 'celsius' ? '°C' : '°F'})`,
+        label: `Max Temperature (°${temperatureUnit === 'celsius' ? 'C' : 'F'})`,
         data: maxTemps,
         borderColor: '#ff6b6b',
         backgroundColor: 'rgba(255, 107, 107, 0.1)',
-        borderWidth: 3,
         fill: true,
         tension: 0.4,
         pointBackgroundColor: '#ff6b6b',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 6,
-        pointHoverRadius: 8,
+        pointHoverRadius: 8
       },
       {
-        label: `Low Temperature (${temperatureUnit === 'celsius' ? '°C' : '°F'})`,
+        label: `Min Temperature (°${temperatureUnit === 'celsius' ? 'C' : 'F'})`,
         data: minTemps,
         borderColor: '#4ecdc4',
         backgroundColor: 'rgba(78, 205, 196, 0.1)',
-        borderWidth: 3,
         fill: true,
         tension: 0.4,
         pointBackgroundColor: '#4ecdc4',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 6,
-        pointHoverRadius: 8,
+        pointHoverRadius: 8
       }
     ]
   };
@@ -113,7 +116,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
     },
     plugins: {
       legend: {
-        position: 'top',
+        position: 'top' as const,
         labels: {
           color: '#f8f9fa',
           font: {
@@ -133,8 +136,10 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
         cornerRadius: 8,
         displayColors: true,
         callbacks: {
-          label: function(context) {
-            return `${context.dataset.label}: ${context.parsed.y}°${temperatureUnit === 'celsius' ? 'C' : 'F'}`;
+          label: function(context: any) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value}°${temperatureUnit === 'celsius' ? 'C' : 'F'}`;
           }
         }
       }
@@ -146,7 +151,7 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
           borderColor: 'rgba(255, 255, 255, 0.2)'
         },
         ticks: {
-          color: '#f8f9fa',
+          color: '#e9ecef',
           font: {
             size: 12
           }
@@ -158,28 +163,26 @@ const TemperatureChart = ({ forecast, temperatureUnit = 'fahrenheit' }) => {
           borderColor: 'rgba(255, 255, 255, 0.2)'
         },
         ticks: {
-          color: '#f8f9fa',
+          color: '#e9ecef',
           font: {
             size: 12
           },
-          callback: function(value) {
-            return value + (temperatureUnit === 'celsius' ? '°C' : '°F');
+          callback: function(value: any) {
+            return `${value}°${temperatureUnit === 'celsius' ? 'C' : 'F'}`;
           }
         }
       }
     },
     interaction: {
-      intersect: false,
-      mode: 'index'
+      mode: 'index' as const,
+      intersect: false
     }
   };
 
   return (
     <div className="temperature-chart">
-      <h3>7-Day Temperature Forecast</h3>
-      <div className="chart-container">
-        <Line ref={chartRef} data={data} options={options} />
-      </div>
+      <h3>Temperature Forecast</h3>
+      <Line ref={chartRef} data={data} options={options} />
     </div>
   );
 };
