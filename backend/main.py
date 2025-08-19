@@ -14,10 +14,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware
+# Add CORS middleware - allow both localhost and Vercel domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:5173",
+        "https://weather-dashboard-*.vercel.app",  # Vercel preview deployments
+        "https://weather-dashboard-*.vercel.app",  # Vercel production
+        "https://*.vercel.app"  # Any Vercel domain (for safety)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -71,10 +77,10 @@ async def get_current_weather(city: str):
                         "condition": data["current"]["condition"]["text"],
                         "icon": data["current"]["condition"]["icon"],
                         "humidity": data["current"]["humidity"],
-                        "wind_speed_kph": data["current"]["wind_kph"],
+                        "wind_kph": data["current"]["wind_kph"],  # Fixed: match frontend expectation
                         "wind_direction": data["current"]["wind_degree"],
                         "pressure_mb": data["current"]["pressure_mb"],
-                        "uv_index": data["current"]["uv"],
+                        "uv": data["current"]["uv"],  # Fixed: match frontend expectation
                         "feels_like_c": data["current"]["feelslike_c"],
                         "feels_like_f": data["current"]["feelslike_f"]
                     },
@@ -125,7 +131,7 @@ async def get_forecast(city: str, days: int = 7):
                         "icon": day["day"]["condition"]["icon"],
                         "precipitation_mm": day["day"]["totalprecip_mm"],
                         "max_wind_kph": day["day"]["maxwind_kph"],
-                        "uv_index": day["day"]["uv"],
+                        "uv": day["day"]["uv"],  # Fixed: match frontend expectation
                         "sunrise": day["astro"]["sunrise"],
                         "sunset": day["astro"]["sunset"]
                     })
@@ -148,4 +154,6 @@ async def get_forecast(city: str, days: int = 7):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Use environment variable for port (Render requirement)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
