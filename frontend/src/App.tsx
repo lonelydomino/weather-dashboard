@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground } from './components'
+import { API_ENDPOINTS } from './config'
 
 // Type definitions
 interface WeatherData {
@@ -62,7 +63,7 @@ function App() {
   // Function to get weather by coordinates
   const getWeatherByCoordinates = async (lat: number, lon: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/weather/current/${lat},${lon}`);
+      const response = await fetch(API_ENDPOINTS.CURRENT_WEATHER(`${lat},${lon}`));
       if (response.ok) {
         const data = await response.json();
         setWeather(data);
@@ -101,7 +102,7 @@ function App() {
   const fetchWeatherData = async (cityName: string) => {
     try {
       // Fetch current weather
-      const weatherResponse = await fetch(`http://localhost:8000/api/weather/current/${cityName}`);
+      const weatherResponse = await fetch(API_ENDPOINTS.CURRENT_WEATHER(cityName));
       if (weatherResponse.ok) {
         const weatherData = await weatherResponse.json();
         setWeather(weatherData);
@@ -111,7 +112,7 @@ function App() {
       }
 
       // Fetch forecast data
-      const forecastResponse = await fetch(`http://localhost:8000/api/weather/forecast/${cityName}`);
+      const forecastResponse = await fetch(API_ENDPOINTS.FORECAST(cityName));
       if (forecastResponse.ok) {
         const forecastData = await forecastResponse.json();
         setForecast(forecastData.forecast);
