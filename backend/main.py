@@ -20,9 +20,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000", 
         "http://localhost:5173",
+        "https://weather-dashboard-nine-beta.vercel.app",  # User's actual Vercel domain
         "https://weather-dashboard-*.vercel.app",  # Vercel preview deployments
-        "https://weather-dashboard-*.vercel.app",  # Vercel production
-        "https://*.vercel.app"  # Any Vercel domain (for safety)
+        "https://*.vercel.app",  # Any Vercel domain (for safety)
+        "*"  # Allow all origins for now (can be restricted later)
     ],
     allow_credentials=True,
     allow_methods=["*"],
