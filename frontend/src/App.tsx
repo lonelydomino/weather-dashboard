@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground } from './components'
+import { TemperatureChart, PrecipitationChart, WeatherMap, WeatherIcon, DynamicBackground, Loader } from './components'
 import { API_ENDPOINTS } from './config'
 
 // Type definitions
@@ -50,6 +50,7 @@ function App() {
   const [locationPermission, setLocationPermission] = useState('prompt');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>('fahrenheit');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check location permission on component mount
   useEffect(() => {
@@ -79,16 +80,25 @@ function App() {
 
   // Function to get weather by coordinates
   const getWeatherByCoordinates = async (lat: number, lon: number) => {
+    setIsLoading(true);
     try {
       const response = await fetch(API_ENDPOINTS.CURRENT_WEATHER(`${lat},${lon}`));
       if (response.ok) {
         const data = await response.json();
         setWeather(data);
+        // Fetch forecast for coordinates
+        const forecastResponse = await fetch(API_ENDPOINTS.FORECAST(`${lat},${lon}`));
+        if (forecastResponse.ok) {
+          const forecastData = await forecastResponse.json();
+          setForecast(forecastData.forecast);
+        }
       } else {
         console.error('Failed to get weather for your location');
       }
     } catch (err) {
       console.error('Failed to fetch weather data for your location');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -117,6 +127,7 @@ function App() {
 
   // Function to fetch weather data
   const fetchWeatherData = async (cityName: string) => {
+    setIsLoading(true);
     try {
       // Fetch current weather
       const weatherResponse = await fetch(API_ENDPOINTS.CURRENT_WEATHER(cityName));
@@ -126,6 +137,7 @@ function App() {
         setWeather(weatherData);
       } else {
         console.error('City not found or weather data unavailable');
+        setIsLoading(false);
         return;
       }
 
@@ -141,6 +153,8 @@ function App() {
       }
     } catch (err) {
       console.error('Failed to fetch weather data. Is the backend running?');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -221,8 +235,15 @@ function App() {
           </div>
         </section>
 
+        {/* Loading State */}
+        {isLoading && (
+          <section className="weather-display">
+            <Loader message="Fetching weather data..." />
+          </section>
+        )}
+
         {/* Weather Display */}
-        {weather && (
+        {!isLoading && weather && (
           <section className="weather-display">
             <div className="weather-info">
               <div className="location">
@@ -260,7 +281,7 @@ function App() {
         )}
 
         {/* Charts Section */}
-        {forecast && forecast.length > 0 && (
+        {!isLoading && forecast && forecast.length > 0 && (
           <section className="charts-section">
             <div className="chart-container">
               <TemperatureChart key={`temp-${city}-${temperatureUnit}`} forecast={forecast} temperatureUnit={temperatureUnit} />
@@ -272,7 +293,7 @@ function App() {
         )}
         
         {/* Weather Map */}
-        {weather && (
+        {!isLoading && weather && (
           <section className="map-section">
             <div className="weather-map">
               <WeatherMap weather={weather} forecast={forecast} city={city} temperatureUnit={temperatureUnit} />
